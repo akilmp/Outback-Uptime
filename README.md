@@ -18,10 +18,9 @@
 14. [Chaos Engineering & DR](#chaos-engineering--dr)
 15. [Security & Policy‑as‑Code](#security--policy-as-code)
 16. [Cost Management](#cost-management)
-17. [Demo Recording Guide](#demo-recording-guide)
-18. [Troubleshooting & FAQ](#troubleshooting--faq)
-19. [Stretch Goals](#stretch-goals)
-20. [References](#references)
+17. [Troubleshooting & FAQ](#troubleshooting--faq)
+18. [Stretch Goals](#stretch-goals)
+19. [References](#references)
 
 ---
 
@@ -264,19 +263,8 @@ Alert: Kubecost slack when daily spend > \$1.
 
 ---
 
-## Demo Recording Guide
 
-1. **Intro** — 30 s selfie.
-2. **Git push** — see GH Actions (lint, scan, cost comment).
-3. **Flux sync** — watch rollout canary in Argo UI.
-4. **Litmus chaos** — inject latency; SLO burn triggers rollback.
-5. **Kill ingress** — Route53 flips to Azure (25 s).
-6. **Linkerd tap** — live mTLS stream.
-7. **Cost dashboard** — wrap‑up.
 
-Record 1440p\@60 fps; profile stored `docs/obs/outback.json`.
-
----
 
 ## Troubleshooting & FAQ
 
