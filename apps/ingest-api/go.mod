@@ -5,6 +5,7 @@ go 1.24.3
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.40.1
 	github.com/DATA-DOG/go-sqlmock v1.5.2
+
 	go.opentelemetry.io/otel/sdk v1.37.0
 	go.opentelemetry.io/otel/trace v1.37.0
 )
@@ -27,4 +28,5 @@ require (
 	go.opentelemetry.io/otel/metric v1.37.0 // indirect
 	golang.org/x/sys v0.34.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+
 )

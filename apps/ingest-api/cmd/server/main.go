@@ -23,7 +23,7 @@ func main() {
 		log.Fatal(err)
 	}
 	processor := service.NewProcessor(writer, tracer)
-	consumer := mqtt.NewConsumer(processor)
+	consumer := mqtt.NewConsumer("tcp://localhost:1883", "ingest", processor)
 	if err := consumer.Start(ctx); err != nil {
 		log.Fatal(err)
 	}
