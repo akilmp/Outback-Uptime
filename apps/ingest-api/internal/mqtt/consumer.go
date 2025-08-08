@@ -9,53 +9,42 @@ import (
 	"ingest/internal/service"
 )
 
+// Client represents the behavior required from an MQTT client. It allows
+// connecting to a broker, subscribing to messages and disconnecting.
+type Client interface {
+	Connect() error
+	Subscribe(handler func(id string, payload []byte)) error
+	Disconnect() error
+}
+
 // Consumer represents an MQTT consumer that feeds messages to the processor.
 type Consumer struct {
+	client    Client
 	processor *service.Processor
 	broker    string
 	topic     string
 	client    mqtt.Client
 }
 
-// NewConsumer creates a new Consumer configured for a broker and topic.
-func NewConsumer(broker, topic string, p *service.Processor) *Consumer {
-	return &Consumer{
-		broker:    broker,
-		topic:     topic,
-		processor: p,
-	}
+// NewConsumer creates a new Consumer.
+func NewConsumer(client Client, p *service.Processor) *Consumer {
+	return &Consumer{client: client, processor: p}
 }
 
-// Start connects to the MQTT broker, subscribes to the topic and processes messages.
+// Start connects to the MQTT broker, subscribes to messages, and forwards them
+// to the processor until the context is cancelled.
 func (c *Consumer) Start(ctx context.Context) error {
-	if ctx.Err() != nil {
-		return ctx.Err()
+	if err := c.client.Connect(); err != nil {
+		return err
 	}
-
-	opts := mqtt.NewClientOptions().AddBroker(c.broker)
-	client := mqtt.NewClient(opts)
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		return token.Error()
-	}
-	c.client = client
-
-	msgCh := make(chan mqtt.Message, 1)
-	token := client.Subscribe(c.topic, 0, func(_ mqtt.Client, m mqtt.Message) {
-		msgCh <- m
-	})
-	if token.Wait() && token.Error() != nil {
-		client.Disconnect(250)
-		return token.Error()
-	}
-
-	for {
-		select {
-		case <-ctx.Done():
-			client.Unsubscribe(c.topic)
-			client.Disconnect(250)
-			return ctx.Err()
-		case msg := <-msgCh:
-			_ = c.processor.Process(ctx, strconv.Itoa(int(msg.MessageID())), msg.Payload())
+	if err := c.client.Subscribe(func(id string, payload []byte) {
+		if c.processor != nil {
+			_ = c.processor.Process(ctx, id, payload)
 		}
+	}); err != nil {
+		return err
 	}
+	<-ctx.Done()
+	_ = c.client.Disconnect()
+	return ctx.Err()
 }
