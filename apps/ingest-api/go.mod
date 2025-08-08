@@ -1,6 +1,8 @@
 module ingest
 
-go 1.24.3
+go 1.23.0
+
+toolchain go1.24.3
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.40.1
@@ -10,11 +12,6 @@ require (
 	go.opentelemetry.io/otel/sdk v1.37.0
 	go.opentelemetry.io/otel/sdk/metric v1.37.0
 	go.opentelemetry.io/otel/trace v1.37.0
-)
-
-require (
-	github.com/eclipse/paho.mqtt.golang v1.5.0
-	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.37.0
 )
 
 require (
