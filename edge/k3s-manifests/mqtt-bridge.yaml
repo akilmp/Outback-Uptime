@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-bridge
+  namespace: edge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-bridge
+  template:
+    metadata:
+      labels:
+        app: mqtt-bridge
+    spec:
+      containers:
+        - name: mqtt-bridge
+          image: eclipse-mosquitto:2
+          args: ["-c", "/mosquitto-no-auth.conf"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mqtt-bridge
+  namespace: edge
+spec:
+  selector:
+    app: mqtt-bridge
+  ports:
+    - port: 1883
+      targetPort: 1883

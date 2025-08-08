@@ -163,6 +163,17 @@ linkerd check
 
 Edge emulation: `docker compose -f edge/docker-compose.sim.yaml up` publishes MQTT messages.
 
+### Edge Deployment & Failover Drill
+
+```bash
+# apply edge namespace workloads
+kubectl apply -f edge/k3s-manifests/
+
+# shift traffic from primary to secondary (dry run)
+DRY_RUN=true RESOURCE_GROUP=my-rg PROFILE_NAME=my-tm \
+  hack/failover.sh aws azure
+```
+
 ---
 
 ## Infrastructure‑as‑Code

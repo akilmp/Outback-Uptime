@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skupper-router
+  namespace: edge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: skupper-router
+  template:
+    metadata:
+      labels:
+        app: skupper-router
+    spec:
+      containers:
+        - name: router
+          image: quay.io/skupper/router:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: skupper-router
+  namespace: edge
+spec:
+  selector:
+    app: skupper-router
+  ports:
+    - name: amqp
+      port: 5672
+      targetPort: 5672
