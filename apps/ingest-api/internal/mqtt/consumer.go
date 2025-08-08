@@ -2,9 +2,6 @@ package mqtt
 
 import (
 	"context"
-	"strconv"
-
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 
 	"ingest/internal/service"
 )
@@ -21,9 +18,6 @@ type Client interface {
 type Consumer struct {
 	client    Client
 	processor *service.Processor
-	broker    string
-	topic     string
-	client    mqtt.Client
 }
 
 // NewConsumer creates a new Consumer.
