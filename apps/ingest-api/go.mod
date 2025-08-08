@@ -3,9 +3,10 @@ module ingest
 go 1.24.3
 
 require (
-	github.com/eclipse/paho.mqtt.golang v1.5.0
-	github.com/mochi-co/mqtt v1.3.2
+	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.37.0
+
 	go.opentelemetry.io/otel/sdk v1.37.0
+	go.opentelemetry.io/otel/sdk/metric v1.37.0
 	go.opentelemetry.io/otel/trace v1.37.0
 )
 
