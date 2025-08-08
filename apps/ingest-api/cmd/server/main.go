@@ -11,8 +11,10 @@ import (
 	"time"
 
 	"ingest/internal/clickhouse"
-	"ingest/internal/mqtt"
+	mqttpkg "ingest/internal/mqtt"
 	"ingest/internal/service"
+
+	paho "github.com/eclipse/paho.mqtt.golang"
 
 	stdoutmetric "go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
@@ -23,9 +25,42 @@ type consumer interface {
 	Start(ctx context.Context) error
 }
 
+type pahoClient struct {
+	client paho.Client
+}
+
+func newPahoClient(broker string) mqttpkg.Client {
+	opts := paho.NewClientOptions().AddBroker(broker)
+	c := paho.NewClient(opts)
+	return &pahoClient{client: c}
+}
+
+func (p *pahoClient) Connect() error {
+	token := p.client.Connect()
+	token.Wait()
+	return token.Error()
+}
+
+func (p *pahoClient) Subscribe(handler func(id string, payload []byte)) error {
+	token := p.client.Subscribe("ingest", 0, func(_ paho.Client, msg paho.Message) {
+		handler(msg.Topic(), msg.Payload())
+	})
+	token.Wait()
+	return token.Error()
+}
+
+func (p *pahoClient) Disconnect() error {
+	p.client.Disconnect(0)
+	return nil
+}
+
 var (
-	newWriter   = func(dsn string) (service.Writer, error) { return clickhouse.NewWriter(dsn) }
-	newConsumer = func(broker, topic string, p *service.Processor) consumer { return mqtt.NewConsumer(broker, topic, p) }
+	newWriter = func(dsn string) (service.Writer, error) {
+		return clickhouse.NewWriter(dsn)
+	}
+	newConsumer = func(broker string, p *service.Processor) consumer {
+		return mqttpkg.NewConsumer(newPahoClient(broker), p)
+	}
 )
 
 func getEnv(key, def string) string {
@@ -47,7 +82,6 @@ func getEnvDuration(key string, def time.Duration) time.Duration {
 func run(args []string) error {
 	fs := flag.NewFlagSet("server", flag.ContinueOnError)
 	broker := fs.String("broker", getEnv("BROKER_URL", "mqtt://localhost:1883"), "MQTT broker URL")
-	topic := fs.String("topic", getEnv("BROKER_TOPIC", "ingest"), "MQTT topic")
 	dsn := fs.String("clickhouse", getEnv("CLICKHOUSE_DSN", "tcp://localhost:9000"), "ClickHouse DSN")
 	timeout := fs.Duration("shutdown-timeout", getEnvDuration("SHUTDOWN_TIMEOUT", 5*time.Second), "graceful shutdown timeout")
 	if err := fs.Parse(args); err != nil {
@@ -76,9 +110,9 @@ func run(args []string) error {
 		return err
 	}
 	processor := service.NewProcessor(writer, tracer)
-	consumer := newConsumer(*broker, *topic, processor)
+	consumer := newConsumer(*broker, processor)
 
-	logger.Info("starting server", "broker", *broker, "topic", *topic, "clickhouse", *dsn)
+	logger.Info("starting server", "broker", *broker, "clickhouse", *dsn)
 
 	errCh := make(chan error, 1)
 	go func() { errCh <- consumer.Start(ctx) }()
