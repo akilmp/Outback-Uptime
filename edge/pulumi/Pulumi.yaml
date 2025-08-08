@@ -1,0 +1,3 @@
+name: edge-cluster
+runtime: nodejs
+description: Pulumi stack for edge Kubernetes resources
