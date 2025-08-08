@@ -14,8 +14,6 @@ import (
 	mqttpkg "ingest/internal/mqtt"
 	"ingest/internal/service"
 
-	paho "github.com/eclipse/paho.mqtt.golang"
-
 	stdoutmetric "go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -25,41 +23,12 @@ type consumer interface {
 	Start(ctx context.Context) error
 }
 
-type pahoClient struct {
-	client paho.Client
-}
-
-func newPahoClient(broker string) mqttpkg.Client {
-	opts := paho.NewClientOptions().AddBroker(broker)
-	c := paho.NewClient(opts)
-	return &pahoClient{client: c}
-}
-
-func (p *pahoClient) Connect() error {
-	token := p.client.Connect()
-	token.Wait()
-	return token.Error()
-}
-
-func (p *pahoClient) Subscribe(handler func(id string, payload []byte)) error {
-	token := p.client.Subscribe("ingest", 0, func(_ paho.Client, msg paho.Message) {
-		handler(msg.Topic(), msg.Payload())
-	})
-	token.Wait()
-	return token.Error()
-}
-
-func (p *pahoClient) Disconnect() error {
-	p.client.Disconnect(0)
-	return nil
-}
-
 var (
 	newWriter = func(dsn string) (service.Writer, error) {
 		return clickhouse.NewWriter(dsn)
 	}
 	newConsumer = func(broker string, p *service.Processor) consumer {
-		return mqttpkg.NewConsumer(newPahoClient(broker), p)
+		return mqttpkg.NewConsumer(broker, "ingest", p)
 	}
 )
 

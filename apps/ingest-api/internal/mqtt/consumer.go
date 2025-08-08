@@ -3,12 +3,16 @@ package mqtt
 import (
 	"context"
 
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+
 	"ingest/internal/service"
 )
 
 // Consumer represents an MQTT consumer that feeds messages to the processor.
 type Consumer struct {
 	client    mqtt.Client
+	broker    string
+	topic     string
 	processor *service.Processor
 }
 
