@@ -15,6 +15,7 @@ import (
 	"ingest/internal/service"
 
 	paho "github.com/eclipse/paho.mqtt.golang"
+
 	stdoutmetric "go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"

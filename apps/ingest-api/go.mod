@@ -13,6 +13,11 @@ require (
 )
 
 require (
+	github.com/eclipse/paho.mqtt.golang v1.5.0
+	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.37.0
+)
+
+require (
 	github.com/ClickHouse/ch-go v0.67.0 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/go-faster/city v1.0.1 // indirect

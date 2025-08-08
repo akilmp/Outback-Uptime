@@ -6,39 +6,37 @@ import (
 	"ingest/internal/service"
 )
 
-// Client represents the behavior required from an MQTT client. It allows
-// connecting to a broker, subscribing to messages and disconnecting.
-type Client interface {
-	Connect() error
-	Subscribe(handler func(id string, payload []byte)) error
-	Disconnect() error
-}
-
 // Consumer represents an MQTT consumer that feeds messages to the processor.
 type Consumer struct {
-	client    Client
+	client    mqtt.Client
 	processor *service.Processor
 }
 
 // NewConsumer creates a new Consumer.
-func NewConsumer(client Client, p *service.Processor) *Consumer {
-	return &Consumer{client: client, processor: p}
+func NewConsumer(broker, topic string, p *service.Processor) *Consumer {
+	return &Consumer{broker: broker, topic: topic, processor: p}
 }
 
 // Start connects to the MQTT broker, subscribes to messages, and forwards them
 // to the processor until the context is cancelled.
 func (c *Consumer) Start(ctx context.Context) error {
-	if err := c.client.Connect(); err != nil {
-		return err
+	if c.client == nil {
+		opts := mqtt.NewClientOptions().AddBroker(c.broker)
+		c.client = mqtt.NewClient(opts)
 	}
-	if err := c.client.Subscribe(func(id string, payload []byte) {
+	if token := c.client.Connect(); token.Wait() && token.Error() != nil {
+		return token.Error()
+	}
+	if token := c.client.Subscribe(c.topic, 0, func(_ mqtt.Client, msg mqtt.Message) {
 		if c.processor != nil {
-			_ = c.processor.Process(ctx, id, payload)
+			_ = c.processor.Process(ctx, msg.Topic(), msg.Payload())
 		}
-	}); err != nil {
-		return err
+	}); token.Wait() && token.Error() != nil {
+		return token.Error()
 	}
 	<-ctx.Done()
-	_ = c.client.Disconnect()
+	if c.client != nil && c.client.IsConnected() {
+		c.client.Disconnect(0)
+	}
 	return ctx.Err()
 }
