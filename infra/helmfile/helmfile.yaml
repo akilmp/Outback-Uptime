@@ -1,0 +1,42 @@
+environments:
+  dev:
+    values:
+      - environments/dev.yaml
+  prod:
+    values:
+      - environments/prod.yaml
+
+repositories:
+  - name: argo
+    url: https://argoproj.github.io/argo-helm
+  - name: hashicorp
+    url: https://helm.releases.hashicorp.com
+  - name: prometheus-community
+    url: https://prometheus-community.github.io/helm-charts
+
+releases:
+  - name: linkerd
+    namespace: linkerd
+    chart: ../../charts/linkerd
+    values:
+      - ha: {{ .Values.linkerd.ha }}
+
+  - name: monitoring
+    namespace: monitoring
+    chart: prometheus-community/kube-prometheus-stack
+    values:
+      - prometheus:
+          prometheusSpec:
+            retention: {{ .Values.monitoring.prometheus.retention }}
+
+  - name: argo-rollouts
+    namespace: argo-rollouts
+    chart: argo/argo-rollouts
+
+  - name: vault
+    namespace: vault
+    chart: hashicorp/vault
+    values:
+      - server:
+          ha:
+            replicas: {{ .Values.vault.replicas }}

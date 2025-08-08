@@ -182,6 +182,8 @@ DRY_RUN=true RESOURCE_GROUP=my-rg PROFILE_NAME=my-tm \
 2. `infra/terraform/azure` — VNet, AKS Autopilot, Traffic Manager, Storage.
 3. `edge/pulumi` — K3s install via k3sup, fleet Helm releases.
 
+4. `infra/helmfile` — Helmfile installing Linkerd, monitoring stack, Argo Rollouts, and Vault. Run `helmfile apply -e <env>` after Terraform to bootstrap the cluster.
+
 CI plans run Infracost & tfsec before merge.
 
 ---
