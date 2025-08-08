@@ -102,5 +102,6 @@ func main() {
         slog.Error("server terminated", "err", err)
         os.Exit(1)
     }
+
 }
 
