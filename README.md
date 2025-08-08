@@ -192,6 +192,21 @@ CI plans run Infracost & tfsec before merge.
 * **Kustomize overlays** add env‑specific patches (replicas, resource limits).
 * **SealedSecrets** for non‑Vault edge configs.
 
+### Flux Installation
+
+1. Install the Flux CLI:
+```bash
+curl -s https://fluxcd.io/install.sh | sudo bash
+```
+2. Deploy the Flux controllers:
+```bash
+flux install
+```
+3. Apply the GitRepository and Kustomizations:
+```bash
+kubectl apply -k flux
+```
+
 ---
 
 ## CI Pipeline (GitHub Actions)
