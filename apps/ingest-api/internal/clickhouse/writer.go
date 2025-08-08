@@ -1,27 +1,34 @@
 package clickhouse
 
-import "context"
+import (
+	"context"
+	"database/sql"
 
-// Inserter defines the behavior required to persist a record into ClickHouse.
-type Inserter interface {
-	Insert(ctx context.Context, id string, payload []byte) error
-}
+	_ "github.com/ClickHouse/clickhouse-go/v2"
+)
 
-// Writer writes records to ClickHouse using an Inserter implementation.
+// Writer writes records to ClickHouse.
 type Writer struct {
-	inserter Inserter
+	db *sql.DB
 }
 
-// NewWriter creates a new Writer. The dsn parameter would normally configure
-// the ClickHouse connection; for tests an Inserter can be supplied.
-func NewWriter(dsn string, i Inserter) *Writer {
-	return &Writer{inserter: i}
-}
-
-// Write persists a record using the underlying Inserter.
-func (w *Writer) Write(ctx context.Context, id string, payload []byte) error {
-	if w.inserter == nil {
-		return nil
+// NewWriter creates a new Writer. The dsn parameter configures the ClickHouse
+// connection.
+func NewWriter(dsn string) (*Writer, error) {
+	db, err := sql.Open("clickhouse", dsn)
+	if err != nil {
+		return nil, err
 	}
-	return w.inserter.Insert(ctx, id, payload)
+	if err := db.Ping(); err != nil {
+		return nil, err
+	}
+	return &Writer{db: db}, nil
+}
+
+// Write persists a record.
+func (w *Writer) Write(ctx context.Context, id string, payload []byte) error {
+	_, err := w.db.ExecContext(ctx,
+		"INSERT INTO events (id, payload) VALUES (?, ?)", id, payload)
+	return err
+
 }
