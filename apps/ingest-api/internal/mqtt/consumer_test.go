@@ -77,5 +77,6 @@ func TestConsumerRoutesMessages(t *testing.T) {
 	cancel()
 	if err := <-errCh; err != context.Canceled {
 		t.Fatalf("unexpected error: %v", err)
+
 	}
 }
