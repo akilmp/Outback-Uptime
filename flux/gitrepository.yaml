@@ -1,0 +1,10 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: outback-uptime
+  namespace: flux-system
+spec:
+  interval: 10m
+  url: https://github.com/outback-uptime/Outback-Uptime
+  ref:
+    branch: main
