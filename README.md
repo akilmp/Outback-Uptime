@@ -161,7 +161,7 @@ linkerd install | kubectl apply -f -
 linkerd check
 ```
 
-Edge emulation: `docker compose -f edge/docker-compose.sim.yaml up` publishes MQTT messages.
+Edge emulation: run `docker compose -f edge/docker-compose.sim.yaml up` to start an MQTT broker and publish sample telemetry every 30 seconds.
 
 ### Edge Deployment & Failover Drill
 
@@ -184,6 +184,7 @@ DRY_RUN=true RESOURCE_GROUP=my-rg PROFILE_NAME=my-tm \
 
 4. `infra/helmfile` — Helmfile installing Linkerd, monitoring stack, Argo Rollouts, and Vault. Run `helmfile apply -e <env>` after Terraform to bootstrap the cluster.
 
+
 CI plans run Infracost & tfsec before merge.
 
 ---
@@ -193,6 +194,21 @@ CI plans run Infracost & tfsec before merge.
 * **Flux CD** watches `flux/root.yaml` → deploys Argo Rollouts, mesh, monitoring.
 * **Kustomize overlays** add env‑specific patches (replicas, resource limits).
 * **SealedSecrets** for non‑Vault edge configs.
+
+### Flux Installation
+
+1. Install the Flux CLI:
+```bash
+curl -s https://fluxcd.io/install.sh | sudo bash
+```
+2. Deploy the Flux controllers:
+```bash
+flux install
+```
+3. Apply the GitRepository and Kustomizations:
+```bash
+kubectl apply -k flux
+```
 
 ---
 

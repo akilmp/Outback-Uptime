@@ -1,0 +1,9 @@
+{
+  "name": "edge-pulumi",
+  "version": "1.0.0",
+  "dependencies": {
+    "@pulumi/pulumi": "^3.0.0",
+    "@pulumi/kubernetes": "^4.0.0",
+    "@pulumi/command": "^0.7.0"
+  }
+}

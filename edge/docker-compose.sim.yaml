@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  mqtt:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+    restart: unless-stopped
+  publisher:
+    image: efrecon/mqtt-client:latest
+    depends_on:
+      - mqtt
+    command: >-
+      sh -c "while true; do mosquitto_pub -h mqtt -t sensors/temperature -m '{\"temp\":25}' ; sleep 30; done"
+    restart: unless-stopped
