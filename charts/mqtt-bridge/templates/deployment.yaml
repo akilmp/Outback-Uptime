@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-bridge
+  labels:
+    app: mqtt-bridge
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: mqtt-bridge
+  template:
+    metadata:
+      labels:
+        app: mqtt-bridge
+    spec:
+      containers:
+        - name: mqtt-bridge
+          image: {{ .Values.image }}
+          env:
+            - name: BROKER_URL
+              value: {{ .Values.broker.url | quote }}
+            - name: BROKER_USERNAME
+              value: {{ .Values.broker.username | quote }}
+            - name: BROKER_PASSWORD
+              value: {{ .Values.broker.password | quote }}

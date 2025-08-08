@@ -1,0 +1,6 @@
+replicaCount: 1
+image: eclipse-mosquitto:2
+broker:
+  url: ""
+  username: ""
+  password: ""
