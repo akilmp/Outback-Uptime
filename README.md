@@ -161,7 +161,7 @@ linkerd install | kubectl apply -f -
 linkerd check
 ```
 
-Edge emulation: `docker compose -f edge/docker-compose.sim.yaml up` publishes MQTT messages.
+Edge emulation: run `docker compose -f edge/docker-compose.sim.yaml up` to start an MQTT broker and publish sample telemetry every 30 seconds.
 
 ### Edge Deployment & Failover Drill
 
