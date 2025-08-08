@@ -1,0 +1,21 @@
+name: rollout-update
+
+on:
+  workflow_dispatch:
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: v1.30.0
+
+      - name: Update rollout image
+        uses: argoproj/rollouts-actions@v2
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+        with:
+          namespace: default
+          args: set image ingest-api ingest-api=ghcr.io/${{ github.repository }}/ingest-api:${{ github.sha }} --record

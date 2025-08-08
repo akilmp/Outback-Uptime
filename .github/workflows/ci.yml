@@ -1,0 +1,46 @@
+name: ci
+
+on:
+  push:
+    branches: ['*']
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  test-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: apps/ingest-api/go.mod
+          cache: true
+
+      - name: Run tests
+        working-directory: apps/ingest-api
+        run: go test ./...
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trivy scan
+        uses: aquasecurity/trivy-action@v0.12.0
+        with:
+          image-ref: ghcr.io/${{ github.repository }}/ingest-api:${{ github.sha }}
+
+      - name: Infracost comment
+        uses: infracost/actions/comment@v2
+        env:
+          INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+        with:
+          path: infra
+          behavior: update
+          github-token: ${{ github.token }}
