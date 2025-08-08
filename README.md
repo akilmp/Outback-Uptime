@@ -210,6 +210,8 @@ jobs:
 * Rollout manifest defines analysis template querying Prometheus metric `ingest_latency_p95`.
 * Steps: 10 % → pause 2 min → 50 % → pause 5 min → full.
 * Auto‑abort if latency increase > 20 % baseline.
+* Monitor rollout with `kubectl argo rollouts get rollout ingest-api -w -n <env>` or via the Argo Rollouts dashboard.
+* Roll back instantly with `kubectl argo rollouts undo ingest-api -n <env>`.
 
 ---
 
