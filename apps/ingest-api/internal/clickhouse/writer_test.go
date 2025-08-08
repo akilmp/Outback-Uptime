@@ -26,6 +26,7 @@ func TestWriterWriteSuccess(t *testing.T) {
 
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("expectations were not met: %v", err)
+
 	}
 }
 
@@ -47,5 +48,6 @@ func TestWriterWriteError(t *testing.T) {
 
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("expectations were not met: %v", err)
+
 	}
 }

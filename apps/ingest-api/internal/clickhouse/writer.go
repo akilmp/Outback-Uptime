@@ -30,4 +30,5 @@ func (w *Writer) Write(ctx context.Context, id string, payload []byte) error {
 	_, err := w.db.ExecContext(ctx,
 		"INSERT INTO events (id, payload) VALUES (?, ?)", id, payload)
 	return err
+
 }

@@ -6,7 +6,9 @@ require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.40.1
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 
+
 	go.opentelemetry.io/otel/sdk v1.37.0
+	go.opentelemetry.io/otel/sdk/metric v1.37.0
 	go.opentelemetry.io/otel/trace v1.37.0
 )
 
