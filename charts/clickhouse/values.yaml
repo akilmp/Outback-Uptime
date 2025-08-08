@@ -1,0 +1,7 @@
+replicaCount: 1
+image:
+  repository: clickhouse
+  tag: latest
+service:
+  type: ClusterIP
+  port: 9000
