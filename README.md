@@ -182,18 +182,8 @@ DRY_RUN=true RESOURCE_GROUP=my-rg PROFILE_NAME=my-tm \
 2. `infra/terraform/azure` — VNet, AKS Autopilot, Traffic Manager, Storage.
 3. `edge/pulumi` — K3s install via k3sup, fleet Helm releases.
 
-To provision the edge stack:
+4. `infra/helmfile` — Helmfile installing Linkerd, monitoring stack, Argo Rollouts, and Vault. Run `helmfile apply -e <env>` after Terraform to bootstrap the cluster.
 
-```bash
-cd edge/pulumi
-npm install
-pulumi config set brokerUrl <mqtt-url>
-pulumi config set brokerUser <username>
-pulumi config set --secret brokerPassword <password>
-pulumi up
-```
-
-The command outputs the edge namespace and Helm release names for the deployed charts.
 
 CI plans run Infracost & tfsec before merge.
 

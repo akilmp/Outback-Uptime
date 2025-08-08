@@ -1,0 +1,7 @@
+linkerd:
+  ha: false
+monitoring:
+  prometheus:
+    retention: 7d
+vault:
+  replicas: 1
