@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: ingest-latency
+spec:
+  metrics:
+    - name: ingest-latency-p95
+      interval: 1m
+      count: 3
+      successCondition: result[0] < 0.3
+      failureCondition: result[0] > 0.5
+      provider:
+        prometheus:
+          address: http://prometheus.monitoring:9090
+          query: ingest_latency_p95
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: ingest-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ingest-api
+  template:
+    metadata:
+      labels:
+        app: ingest-api
+    spec:
+      containers:
+        - name: ingest-api
+          image: ghcr.io/outback-uptime/ingest-api:latest
+          ports:
+            - containerPort: 80
+  strategy:
+    canary:
+      analysis:
+        templates:
+          - templateName: ingest-latency
+      steps:
+        - setWeight: 10
+        - pause:
+            duration: 2m
+        - setWeight: 50
+        - pause:
+            duration: 5m
+        - setWeight: 100
