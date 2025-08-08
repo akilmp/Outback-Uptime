@@ -1,0 +1,15 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ingest-api
+  namespace: dev
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: charts/ingest-api
+      sourceRef:
+        kind: GitRepository
+        name: outback-uptime
+        namespace: flux-system
+  values: {}
