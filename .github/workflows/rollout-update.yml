@@ -1,0 +1,41 @@
+name: rollout-update
+
+on:
+  workflow_dispatch:
+    inputs:
+      rollout:
+        description: 'Argo Rollout name'
+        required: true
+      namespace:
+        description: 'Kubernetes namespace'
+        required: true
+        default: default
+      image:
+        description: 'New container image'
+        required: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: v1.30.0
+
+      - name: Install Argo Rollouts plugin
+        run: |
+          curl -sLO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64
+          chmod +x kubectl-argo-rollouts-linux-amd64
+          sudo mv kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
+
+      - name: Update rollout image
+        run: |
+          kubectl-argo-rollouts set image ${{ inputs.rollout }} *=${{ inputs.image }} -n ${{ inputs.namespace }}
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
