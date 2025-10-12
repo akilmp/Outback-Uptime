@@ -306,25 +306,4 @@ Alert: Kubecost slack when daily spend > \$1.
 | Skupper tunnel drops      | Verify edge public IP changed; restart `kubectl port-forward` agent      |
 | Velero restore failed     | Restic repo locked; run `velero restic unlock`                           |
 
----
 
-## Stretch Goals
-
-* **Cilium + Hubble** for eBPF observability.
-* **SPIRE / SPIFFE** workload identities across cloud.
-* **Backstage portal** for service templates.
-* **OpenTF modules** for maintainability.
-
----
-
-## References
-
-* Karpenter docs 2025
-* Linkerd security best practices 2025
-* Argo Rollouts analysis templates 2024
-* LitmusChaos hub – [https://hub.litmuschaos.io/](https://hub.litmuschaos.io/)
-* Kubecost & Infracost integration guide 2025
-
----
-
-*Last updated: 4 Aug 2025*
